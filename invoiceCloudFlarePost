@@ -1,0 +1,55 @@
+function rawHtmlResponse(html) {
+  const init = {
+    headers: {
+      'content-type': 'text/html;charset=UTF-8',
+    },
+  };
+  return new Response(html, init);
+}
+
+
+async function readRequestBody(request) {
+  const { headers } = request;
+  const contentType = headers.get('content-type') || '';
+  const json = await request.json();
+  const rawResponse = 
+  await fetch('https://szjehibddkfzwryyljsw.supabase.co/rest/v1/invoices', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6amVoaWJkZGtmendyeXlsanN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTY3NDI2ODAsImV4cCI6MTk3MjMxODY4MH0.PRy_3XmixaOldM4arN6YTmUpz2rmeLqX7mLles69U7Q',
+      'Content-Type': 'application/json',
+      'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6amVoaWJkZGtmendyeXlsanN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTY3NDI2ODAsImV4cCI6MTk3MjMxODY4MH0.PRy_3XmixaOldM4arN6YTmUpz2rmeLqX7mLles69U7Q'
+    },
+    body: JSON.stringify(json)
+  });
+  let content = {"message" : "success"}
+  console.log(rawResponse);
+  try {
+     content = await rawResponse.json();
+  }
+  catch(err) {
+    return JSON.stringify(content);
+  }
+  return JSON.stringify(content);
+}
+
+
+async function handleRequest(request) {
+  const reqBody = await readRequestBody(request);
+  const retBody = reqBody;
+  return new Response(retBody);
+}
+
+addEventListener('fetch', event => {
+  const { request } = event;
+  const { url } = request;
+
+  if (url.includes('form')) {
+    return event.respondWith(rawHtmlResponse(someForm));
+  }
+  if (request.method === 'POST') {
+    return event.respondWith(handleRequest(request));
+  } else if (request.method === 'GET') {
+    return event.respondWith(new Response(`The request was a GET`));
+  }
+});
